@@ -101,6 +101,42 @@ node.prototype.getNamespace = function() {
 };
 
 /**
+ * Get the current function if applicable
+ * @return {Function} {@link FUNCTION.md|:link:}
+ */
+node.prototype.getFunction = function() {
+    if (this._type === 'function') {
+        return this;
+    }
+    if (!'_function' in this) {
+        const parent = this.getParent();
+        if (parent) {
+            this._function = parent.getFunction();
+        } else {
+            this._function = null;
+        }
+    }
+    return this._function;
+}
+
+/**
+ * Get the block that has a scope for variables
+ * @return {Function|Method|Namespace}
+ */
+node.prototype.getBlockVar = function() {
+    if (['function', 'namespace', 'method'].includes(this._type)) {
+        return this;
+    }
+    if (!'_blockVar' in this) {
+        const parent = this.getParent();
+        if (parent) {
+            this._blockVar = parent.getBlockVar();
+        }
+    }
+    return this._blockVar;
+}
+
+/**
  * Gets the parent block
  * @return {block} {@link BLOCK.md|:link:}
  */

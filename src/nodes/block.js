@@ -66,6 +66,16 @@ Block.prototype.getVariables = function() {
   return this._db.resolve(this.get('variables'));
 };
 
+Block.prototype.getVariable = function(name) {
+    const criteria = {
+        variable: name
+    };
+    const items = this._db.search(criteria);
+    if (items.length > 0) {
+        return this._db.get(items[0]);
+    }
+    return null;
+}
 
 
 /**
@@ -216,6 +226,17 @@ Block.prototype.consumeChild = function(ast) {
                 'uses',
                 this._db.create('usegroup', this, ast)
             );
+        }
+
+        // return statement
+        else if (ast.kind === 'return') {
+            const func = this.getFunction();
+
+            if (func) {
+                const ret = this._db.create('return', func, ast);
+
+                func.add('returns', ret);
+            }
         }
 
         // @todo : variables by global statement

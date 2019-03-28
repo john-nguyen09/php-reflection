@@ -20,6 +20,28 @@ var Block = require('./block');
  */
 var Namespace = Block.extends('namespace');
 
+const KEYWORD_TYPES = new Map([
+  ['bool', 'bool'],
+  ['boolean', 'bool'],
+  ['true', 'bool'],
+  ['false', 'bool'],
+  ['int', 'int'],
+  ['integer', 'int'],
+  ['string', 'string'],
+  ['real', 'real'],
+  ['float', 'float'],
+  ['double', 'double'],
+  ['object', 'object'],
+  ['mixed', 'mixed'],
+  ['array', 'array'],
+  // ['resource', 'resource'],
+  ['void', 'void'],
+  ['null', 'null'],
+  // ['scalar', 'scalar'],
+  // ['callback', 'callback'],
+  // ['callable', 'callable'],
+]);
+
 /**
  * @protected Consumes the current ast node
  */
@@ -143,7 +165,7 @@ Namespace.prototype.findAlias = function(className) {
  */
 Namespace.prototype.resolveClassName = function(name) {
     if (name.kind && name.kind === 'identifier') {
-        if (name.resolution === 'fqn') {
+        if (name.resolution === 'fqn' || KEYWORD_TYPES.has(name.name)) {
             return name.name;
         } else if (name.resolution === 'rn') {
             return this.name + '\\' + name.name;
@@ -154,6 +176,11 @@ Namespace.prototype.resolveClassName = function(name) {
             if (alias) {
                 return alias;
             }
+
+            if (this.name === '\\') {
+              return this.name + name.name;
+            }
+
             // relative to current namespace
             return this.name + '\\' + name.name;
         }

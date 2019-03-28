@@ -191,7 +191,7 @@ declare module "php-reflection" {
         getName(): string;
         eachNode(cb: (child: Node, index: number) => void): File;
         getFirstByName(type: string, name: string): Node;
-        getByType(type: string): Node[];
+        getByType<T extends Node>(type: string): T[];
         getNamespaces(): Namespace[];
         getClasses(): Class[];
         getInterfaces(): Interface[];

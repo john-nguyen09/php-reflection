@@ -6,6 +6,7 @@
 'use strict';
 
 var Node = require('../data/node');
+var typeResolve = require('../typeResolve');
 
 /**
  * **Extends from {@link NODE.md|:link: node}**
@@ -68,42 +69,20 @@ Variable.prototype.consume = function(file, parent, ast) {
             this.name = '#' + ast.left.kind;
         }
         // resolve the variable type
-        var what = ast.right.kind;
-        if (what === 'number') {
-            this.type = 'number';
-        } else if (what === 'boolean') {
-            this.type = 'boolean';
-        } else if (what === 'string') {
-            this.type = 'string';
-        } else if (what === 'array') {
-            this.type = 'array';
-        } else if (what === 'new') {
-            this.type = this.getNamespace().resolveClassName(ast.right.what);
-        } else {
-            this.type = null;
-        }
+        this.type = typeResolve(parent, this, ast.right);
     } else if (ast.kind === 'parameter') {
         this.name = ast.name;
         if (ast.type) {
             this.type = this.getNamespace().resolveClassName(ast.type);
         } else if (ast.value) {
             // resolve from default value
-            var what = ast.value;
-            if (what === 'number') {
-                this.type = 'number';
-            } else if (what === 'boolean') {
-                this.type = 'boolean';
-            } else if (what === 'string') {
-                this.type = 'string';
-            } else if (what === 'array') {
-                this.type = 'array';
-            } else {
-                this.type = null;
-            }
+            this.type = typeResolve(parent, this, ast.value);
         }
     } else if (ast.kind === 'variable') {
         this.name = ast.name;
     }
+
+    this.indexName(this.name);
 };
 
 module.exports = Variable;
